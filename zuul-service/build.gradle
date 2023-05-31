@@ -1,0 +1,25 @@
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '2.3.8.RELEASE'
+	id 'io.spring.dependency-management' version '1.0.10.RELEASE'
+}
+
+group = 'com.example'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '11'
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.boot:spring-boot-starter'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	// https://mvnrepository.com/artifact/org.springframework.cloud/spring-cloud-netflix-zuul
+	implementation group: 'org.springframework.cloud', name: 'spring-cloud-netflix-zuul', version: '2.2.8.RELEASE'
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}
