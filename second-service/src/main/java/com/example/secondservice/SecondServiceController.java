@@ -22,7 +22,7 @@ public class SecondServiceController {
 		return "hello world in second service";
 	}
 
-	@GetMapping("check")
+	@GetMapping("/check")
 	public String check(){
 		return "check ! from second service";
 	}
