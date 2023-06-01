@@ -8,6 +8,7 @@
   <component name="FrameworkDetectionExcludesConfiguration">
     <file type="web" url="file://$PROJECT_DIR$/apigateway-service" />
     <file type="web" url="file://$PROJECT_DIR$/catalog-service" />
+    <file type="web" url="file://$PROJECT_DIR$/config-server" />
     <file type="web" url="file://$PROJECT_DIR$/discoveryservice" />
     <file type="web" url="file://$PROJECT_DIR$/ecommerce" />
     <file type="web" url="file://$PROJECT_DIR$/first-service" />

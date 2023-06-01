@@ -44,6 +44,7 @@ public class UserController {
 			+ ", token expiration time=" + env.getProperty("token.expiration_time"));
 	}
 
+
 	@GetMapping("/welcome")
 	public String welcome(){
 		return greeting.getGreetingMessage();
