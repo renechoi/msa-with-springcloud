@@ -33,6 +33,10 @@ eureka:
 greeting:
   message: Welcome to the simple ecommerce
 
+logging:
+  level:
+    com.example.userservice.client: DEBUG
+
 management:
   endpoints:
     web:

@@ -22,11 +22,13 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import com.example.userservice.client.OrderServiceClient;
 import com.example.userservice.dto.UserDto;
 import com.example.userservice.jpa.UserEntity;
 import com.example.userservice.jpa.UserRepository;
 import com.example.userservice.vo.ResponseOrder;
 
+import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -40,6 +42,7 @@ public class UserServiceImpl implements UserService {
 	private final RestTemplate restTemplate;
 
 	private final Environment environment;
+	private final OrderServiceClient orderServiceClient;
 
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -74,14 +77,26 @@ public class UserServiceImpl implements UserService {
 		if (userEntity == null)
 			throw new UsernameNotFoundException("User not found");
 
-		/* Using as rest template */
-		String orderUrl = String.format(Objects.requireNonNull(environment.getProperty("order_service.url")), userId);
-		ResponseEntity<List<ResponseOrder>> orderListResponse = restTemplate.exchange(orderUrl, HttpMethod.GET, null,
-			new ParameterizedTypeReference<>() {
-			});
-		List<ResponseOrder> ordersList = orderListResponse.getBody();
 		UserDto userDto = new ModelMapper().map(userEntity, UserDto.class);
-		userDto.setOrders(ordersList);
+
+		/* Using as rest template */
+		// String orderUrl = String.format(Objects.requireNonNull(environment.getProperty("order_service.url")), userId);
+		// ResponseEntity<List<ResponseOrder>> orderListResponse = restTemplate.exchange(orderUrl, HttpMethod.GET, null,
+		// 	new ParameterizedTypeReference<>() {
+		// 	});
+		// List<ResponseOrder> ordersList = orderListResponse.getBody();
+
+		/* Using as feign */
+		List<ResponseOrder> orders =null;
+		try {
+			orders = orderServiceClient.getOrders(userId);
+		} catch (FeignException e){
+			log.info(e.getMessage());
+		}
+
+		userDto.setOrders(orders);
+
+
 
 		return userDto;
 	}
