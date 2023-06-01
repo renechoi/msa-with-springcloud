@@ -5,7 +5,8 @@ import com.example.userservice.service.UserService;
 import com.example.userservice.vo.RequestLogin;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import lombok.RequiredArgsConstructor;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.env.Environment;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -24,14 +25,13 @@ import java.util.ArrayList;
 import java.util.Date;
 
 @Slf4j
-@RequiredArgsConstructor
 public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
-    private final UserService userService;
-    private final Environment env;
+    private UserService userService;
+    private Environment env;
 
     public AuthenticationFilter(AuthenticationManager authenticationManager,
-                                UserService userService,
-                                Environment env) {
+        UserService userService,
+        Environment env) {
         super.setAuthenticationManager(authenticationManager);
         this.userService = userService;
         this.env = env;
@@ -39,38 +39,38 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request,
-                                                HttpServletResponse response) throws AuthenticationException {
+        HttpServletResponse response) throws AuthenticationException {
         try {
             RequestLogin creds = new ObjectMapper().readValue(request.getInputStream(), RequestLogin.class);
 
             return getAuthenticationManager().authenticate(
-                    new UsernamePasswordAuthenticationToken(
-                            creds.getEmail(),
-                            creds.getPassword(),
-                            new ArrayList<>()
-                    )
+                new UsernamePasswordAuthenticationToken(
+                    creds.getEmail(),
+                    creds.getPassword(),
+                    new ArrayList<>()
+                )
             );
         } catch(IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    // @Override
-    // protected void successfulAuthentication(HttpServletRequest request,
-    //                                         HttpServletResponse response,
-    //                                         FilterChain chain,
-    //                                         Authentication authResult) throws IOException, ServletException {
-    //     String userName = ((User)authResult.getPrincipal()).getUsername();
-    //     UserDto userDetails = userService.getUserDetailsByEmail(userName);
-    //
-    //     String token = Jwts.builder()
-    //             .setSubject(userDetails.getUserId())
-    //             .setExpiration(new Date(System.currentTimeMillis() +
-    //                     Long.parseLong(env.getProperty("token.expiration_time"))))
-    //             .signWith(SignatureAlgorithm.HS512, env.getProperty("token.secret"))
-    //             .compact();
-    //
-    //     response.addHeader("token", token);
-    //     response.addHeader("userId", userDetails.getUserId());
-    // }
+    @Override
+    protected void successfulAuthentication(HttpServletRequest request,
+        HttpServletResponse response,
+        FilterChain chain,
+        Authentication authResult) throws IOException, ServletException {
+        String userName = ((User)authResult.getPrincipal()).getUsername();
+        UserDto userDetails = userService.getUserDetailsByEmail(userName);
+
+        String token = Jwts.builder()
+            .setSubject(userDetails.getUserId())
+            .setExpiration(new Date(System.currentTimeMillis() +
+                Long.parseLong(env.getProperty("token.expiration_time"))))
+            .signWith(SignatureAlgorithm.HS512, env.getProperty("token.secret"))
+            .compact();
+
+        response.addHeader("token", token);
+        response.addHeader("userId", userDetails.getUserId());
+    }
 }

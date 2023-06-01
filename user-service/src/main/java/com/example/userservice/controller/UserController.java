@@ -27,7 +27,6 @@ import com.example.userservice.vo.ResponseUser;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/user-service")
 @RequiredArgsConstructor
 public class UserController {
 
