@@ -12,12 +12,17 @@ spring:
       path: /h2-console
   jpa:
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: create
     show-sql: true
     generate-ddl: true
   datasource:
-    driver-class-name: org.h2.Driver
-    url: jdbc:h2:mem:testdb
+    datasource:
+      url: jdbc:mysql://localhost:3306/msapractice
+      username: rene
+      password: itiswhatitis
+      driver-class-name: com.mysql.cj.jdbc.Driver
+#    driver-class-name: org.h2.Driver
+#    url: jdbc:h2:mem:testdb
 #    username: sa
 #    password: 1234
 

@@ -5,6 +5,7 @@ import org.hibernate.annotations.ColumnDefault;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Data
@@ -30,6 +31,6 @@ public class OrderEntity implements Serializable {
     private String orderId;
 
     @Column(nullable = false, updatable = false, insertable = false)
-    @ColumnDefault(value = "CURRENT_TIMESTAMP")
-    private Date createdAt;
+    // @ColumnDefault(value = "CURRENT_TIMESTAMP")
+    private LocalDateTime createdAt;
 }
