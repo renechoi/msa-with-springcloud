@@ -2,9 +2,12 @@ package com.example.orderservice.controller;
 
 import com.example.orderservice.dto.OrderDto;
 import com.example.orderservice.jpa.OrderEntity;
+import com.example.orderservice.messagequeue.KafkaProducer;
 import com.example.orderservice.service.OrderService;
 import com.example.orderservice.vo.RequestOrder;
 import com.example.orderservice.vo.ResponseOrder;
+
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
@@ -21,16 +24,12 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/order-service")
 @Slf4j
+@RequiredArgsConstructor
 public class OrderController {
-    Environment env;
-    OrderService orderService;
+    private final Environment env;
+    private final OrderService orderService;
 
-
-    @Autowired
-    public OrderController(Environment env, OrderService orderService) {
-        this.env = env;
-        this.orderService = orderService;
-    }
+    private final KafkaProducer kafkaProducer;
 
     @GetMapping("/health_check")
     public String status() {
@@ -50,6 +49,8 @@ public class OrderController {
 
         OrderDto createdOrder = orderService.createOrder(orderDto);
         ResponseOrder responseOrder = mapper.map(createdOrder, ResponseOrder.class);
+
+        kafkaProducer.send("example-catalog-topic", orderDto);
 
         log.info("After added orders data");
         return ResponseEntity.status(HttpStatus.CREATED).body(responseOrder);
